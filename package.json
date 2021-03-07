@@ -20,7 +20,6 @@
     "date-fns": "^2.19.0",
     "express": "^4.17.1",
     "faunadb": "^4.1.1",
-    "polka": "next",
     "questrade-ts": "^1.0.2",
     "sirv": "^1.0.11"
   },
@@ -40,7 +39,6 @@
     "@types/compression": "^1.7.0",
     "@types/date-fns": "^2.6.0",
     "@types/node": "^14.14.32",
-    "@types/polka": "^0.5.2",
     "postcss-cli": "^8.3.1",
     "postcss-nesting": "^7.0.1",
     "rollup": "^2.40.0",

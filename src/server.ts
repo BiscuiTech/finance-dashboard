@@ -1,14 +1,13 @@
 import * as sapper from '@sapper/server';
 import { json } from 'body-parser';
 import compression from 'compression';
-// import polka from 'polka';
 import express from 'express';
 import sirv from 'sirv';
 
 const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
 
-express() // You can also use Express
+express()
 	.use(json())
 	.use(
 		compression({ threshold: 0 }),
