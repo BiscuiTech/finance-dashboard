@@ -207,3 +207,9 @@
     </div>
   </div>
 </nav>
+
+<style>
+  nav a {
+    color: var(--orange);
+  }
+</style>
