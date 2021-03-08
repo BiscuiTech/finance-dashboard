@@ -1,5 +1,3 @@
-// api/signout.js
-
 import supabase from '../../lib/supabase';
 
 export async function post(req, res) {
