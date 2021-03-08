@@ -1,29 +1,32 @@
 <script lang="ts">
-  import { stores } from "@sapper/app";
+  import { goto, stores } from "@sapper/app";
   import PageLayout from "../components/PageLayout.svelte";
+  import { api } from "../lib/post";
 
   let email: string;
   let password: string;
-  let remember: string;
+  let rememberMe: string;
   let errors = null;
 
   const { session } = stores();
-  /*  async function submit(event) {
+  async function submit(event) {
     const response = await api("POST", `/api/login`, { email, password });
     errors = response.errors;
     if (response.user) {
       $session.user = response.user;
       goto("/");
     }
-  } */
+  }
   async function authenticate(event, authType) {
+    // const { email, password, rememberMe } = event.target.elements;
+    console.log(rememberMe);
     const authAPI = await fetch("/api/auth", {
       method: "POST",
       credentials: "same-origin",
       body: JSON.stringify({
         email: email,
         password: password,
-        remember: remember,
+        remember: rememberMe,
         authType: authType,
       }),
       headers: {
@@ -37,7 +40,7 @@
   }
 </script>
 
-<PageLayout title="Login">
+<PageLayout title="Sign Up">
   <div class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
@@ -47,14 +50,14 @@
           alt="Workflow"
         />
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Sign in to your account
+          Create your account
         </h2>
       </div>
       <form
         class="mt-8 space-y-6"
         action="#"
         method="POST"
-        on:submit|preventDefault={(e) => authenticate(e, "signin")}
+        on:submit|preventDefault={(e) => authenticate(e, "signup")}
       >
         <input type="hidden" name="remember" value="true" />
         <div class="rounded-md shadow-sm -space-y-px">
@@ -93,7 +96,7 @@
               name="remember_me"
               type="checkbox"
               class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              bind:value={remember}
+              bind:value={rememberMe}
             />
             <label for="remember_me" class="ml-2 block text-sm text-gray-900">
               Remember me
@@ -128,7 +131,7 @@
                 />
               </svg>
             </span>
-            Sign in
+            Sign up
           </button>
         </div>
       </form>

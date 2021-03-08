@@ -1,10 +1,8 @@
 <script>
+  import PageLayout from "../components/PageLayout.svelte";
 </script>
 
-<svelte:head>
-  <title>Sapper project template</title>
-</svelte:head>
-<h1 class="text-2xl font-bold text-gray-900">About</h1>
+<PageLayout title="About" />
 
 <style>
 </style>

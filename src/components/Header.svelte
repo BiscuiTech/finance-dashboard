@@ -1,5 +1,26 @@
 <script lang="ts">
   export let segment: string;
+  import { stores } from "@sapper/app";
+
+  const { session } = stores();
+  let isProfileOpen = false;
+  let isMenuOpen = false;
+  const profileButtonHandler = () => {
+    isProfileOpen = !isProfileOpen;
+  };
+  const menuButtonHandler = () => {
+    isMenuOpen = !isMenuOpen;
+  };
+  async function signOut() {
+    const authAPI = await fetch("/api/signout", {
+      method: "POST",
+      credentials: "same-origin",
+    });
+    const { success } = await authAPI.json();
+    if (success) {
+      window.location.href = "/";
+    }
+  }
 </script>
 
 <!-- This example requires Tailwind CSS v2.0+ -->
@@ -13,6 +34,7 @@
           class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
           aria-controls="mobile-menu"
           aria-expanded="false"
+          on:click={() => menuButtonHandler()}
         >
           <span class="sr-only">Open main menu</span>
           <!-- Icon when menu is closed. -->
@@ -22,7 +44,7 @@
             Menu open: "hidden", Menu closed: "block"
           -->
           <svg
-            class="block h-6 w-6"
+            class={`${isMenuOpen ? "hidden" : "block"} h-6 w-6`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -43,7 +65,7 @@
             Menu open: "block", Menu closed: "hidden"
           -->
           <svg
-            class="hidden h-6 w-6"
+            class={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -75,14 +97,14 @@
           />
         </div>
         <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-          <!-- Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
+          <!-- Current: "border-yellow-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" -->
           <a
-            href="#"
-            class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+            href="/"
+            class="border-yellow-500 text-gray-500 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
           >
             Dashboard
           </a>
-          <a
+          <!-- <a
             href="#"
             class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
           >
@@ -99,7 +121,7 @@
             class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
           >
             Calendar
-          </a>
+          </a> -->
         </div>
       </div>
       <div
@@ -134,6 +156,7 @@
               class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               id="user-menu"
               aria-haspopup="true"
+              on:click|preventDefault={() => profileButtonHandler()}
             >
               <span class="sr-only">Open user menu</span>
               <img
@@ -154,26 +177,42 @@
               To: "transform opacity-0 scale-95"
           -->
           <div
-            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5"
+            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 ${isProfileOpen
+              ? 'transform opacity-100 scale-100'
+              : 'transform opacity-0 scale-95'}"
             role="menu"
             aria-orientation="vertical"
             aria-labelledby="user-menu"
           >
-            <a
-              href="#"
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem">Your Profile</a
-            >
-            <a
-              href="#"
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem">Settings</a
-            >
-            <a
-              href="#"
-              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              role="menuitem">Sign out</a
-            >
+            {#if $session.user}
+              <a
+                href="/profile"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                role="menuitem"
+                on:click={() => profileButtonHandler()}>Profile</a
+              >
+              <!--  <a
+            href="#"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            role="menuitem">Settings</a
+            > -->
+              <a
+                href="/"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                role="menuitem"
+                on:click|preventDefault={() => {
+                  profileButtonHandler();
+                  signOut();
+                }}>Sign out</a
+              >
+            {:else}
+              <a
+                href="/login"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                role="menuitem"
+                on:click={() => profileButtonHandler()}>Login</a
+              >
+            {/if}
           </div>
         </div>
       </div>
@@ -181,15 +220,15 @@
   </div>
 
   <!-- Mobile menu, show/hide based on menu state. -->
-  <div class="sm:hidden" id="mobile-menu">
+  <div class={`${isMenuOpen ? "block" : "hidden"} sm:hidden`} id="mobile-menu">
     <div class="pt-2 pb-4 space-y-1">
-      <!-- Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" -->
+      <!-- Current: "bg-indigo-50 border-yellow-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" -->
       <a
-        href="#"
-        class="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+        href="/"
+        class="bg-indigo-50 border-yellow-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
         >Dashboard</a
       >
-      <a
+      <!-- <a
         href="#"
         class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
         >Team</a
@@ -203,7 +242,7 @@
         href="#"
         class="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
         >Calendar</a
-      >
+      > -->
     </div>
   </div>
 </nav>

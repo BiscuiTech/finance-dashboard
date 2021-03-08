@@ -1,10 +1,12 @@
 <script>
+  import { stores } from "@sapper/app";
+  import PageLayout from "../components/PageLayout.svelte";
+
+  const { session } = stores();
+  console.log($session);
 </script>
 
-<svelte:head>
-  <title>Sapper project template</title>
-</svelte:head>
-<h1 class="text-2xl font-bold text-gray-900">Login</h1>
+<PageLayout title="Home" />
 
 <style>
 </style>
