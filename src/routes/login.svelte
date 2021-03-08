@@ -1,25 +1,15 @@
 <script lang="ts">
-  import { stores } from "@sapper/app";
-  import PageLayout from "../components/PageLayout.svelte";
+  import PageLayout from '../components/PageLayout.svelte';
 
   let email: string;
   let password: string;
   let remember: string;
   let errors = null;
 
-  const { session } = stores();
-  /*  async function submit(event) {
-    const response = await api("POST", `/api/login`, { email, password });
-    errors = response.errors;
-    if (response.user) {
-      $session.user = response.user;
-      goto("/");
-    }
-  } */
   async function authenticate(event, authType) {
-    const authAPI = await fetch("/api/auth", {
-      method: "POST",
-      credentials: "same-origin",
+    const authAPI = await fetch('/api/auth', {
+      method: 'POST',
+      credentials: 'same-origin',
       body: JSON.stringify({
         email: email,
         password: password,
@@ -27,12 +17,12 @@
         authType: authType,
       }),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
     const { success } = await authAPI.json();
     if (success) {
-      window.location.href = "/";
+      window.location.href = '/';
     }
   }
 </script>
@@ -54,7 +44,7 @@
         class="mt-8 space-y-6"
         action="#"
         method="POST"
-        on:submit|preventDefault={(e) => authenticate(e, "signin")}
+        on:submit|preventDefault={(e) => authenticate(e, 'signin')}
       >
         <input type="hidden" name="remember" value="true" />
         <div class="rounded-md shadow-sm -space-y-px">
