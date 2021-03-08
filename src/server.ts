@@ -1,5 +1,5 @@
 import * as sapper from '@sapper/server';
-import { json } from 'body-parser';
+import { json, urlencoded } from 'body-parser';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import express from 'express';
@@ -10,9 +10,9 @@ const { PORT, NODE_ENV } = process.env;
 const dev = NODE_ENV === 'development';
 
 express()
-	/* .use(urlencoded({
+	.use(urlencoded({
 		extended: true
-	})) */
+	}))
 	.use(cookieParser())
 	.use(json())
 	.use(
