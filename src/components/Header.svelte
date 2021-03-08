@@ -1,24 +1,28 @@
 <script lang="ts">
   export let segment: string;
-  import { stores } from "@sapper/app";
+  import { goto, stores } from '@sapper/app';
 
   const { session } = stores();
   let isProfileOpen = false;
   let isMenuOpen = false;
   const profileButtonHandler = () => {
-    isProfileOpen = !isProfileOpen;
+    if ($session.userToken) {
+      isProfileOpen = !isProfileOpen;
+    } else {
+      goto('/login');
+    }
   };
   const menuButtonHandler = () => {
     isMenuOpen = !isMenuOpen;
   };
   async function signOut() {
-    const authAPI = await fetch("/api/signout", {
-      method: "POST",
-      credentials: "same-origin",
+    const authAPI = await fetch('/api/signout', {
+      method: 'POST',
+      credentials: 'same-origin',
     });
     const { success } = await authAPI.json();
     if (success) {
-      window.location.href = "/";
+      window.location.href = '/';
     }
   }
 </script>
@@ -44,7 +48,7 @@
             Menu open: "hidden", Menu closed: "block"
           -->
           <svg
-            class={`${isMenuOpen ? "hidden" : "block"} h-6 w-6`}
+            class={`${isMenuOpen ? 'hidden' : 'block'} h-6 w-6`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -65,7 +69,7 @@
             Menu open: "block", Menu closed: "hidden"
           -->
           <svg
-            class={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
+            class={`${isMenuOpen ? 'block' : 'hidden'} h-6 w-6`}
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -152,19 +156,36 @@
         <!-- Profile dropdown -->
         <div class="ml-3 relative">
           <div>
-            <button
-              class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              id="user-menu"
-              aria-haspopup="true"
-              on:click|preventDefault={() => profileButtonHandler()}
-            >
-              <span class="sr-only">Open user menu</span>
-              <img
-                class="h-8 w-8 rounded-full"
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixqx=VyHhhnUHcR&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt=""
-              />
-            </button>
+            {#if $session.userToken}
+              <button
+                class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                id="user-menu"
+                aria-haspopup="true"
+                on:click|preventDefault={() => profileButtonHandler()}
+              >
+                <span class="sr-only">Open user menu</span>
+                <img
+                  class="h-8 w-8 rounded-full"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixqx=VyHhhnUHcR&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt=""
+                />
+              </button>
+            {:else}
+              <a
+                href="/login"
+                class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                id="user-menu"
+                role="menuitem"
+                aria-haspopup="true"
+              >
+                <!-- <span class="sr-only">Open user menu</span>
+                <img
+                  class="h-8 w-8 rounded-full"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixqx=VyHhhnUHcR&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt=""
+                /> -->
+              </a>
+            {/if}
           </div>
           <!--
             Profile dropdown panel, show/hide based on dropdown state.
@@ -176,15 +197,15 @@
               From: "transform opacity-100 scale-100"
               To: "transform opacity-0 scale-95"
           -->
-          <div
-            class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 ${isProfileOpen
-              ? 'transform opacity-100 scale-100'
-              : 'transform opacity-0 scale-95'}"
-            role="menu"
-            aria-orientation="vertical"
-            aria-labelledby="user-menu"
-          >
-            {#if $session.user}
+          {#if $session.userToken}
+            <div
+              class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 ${isProfileOpen
+                ? 'transform opacity-100 scale-100'
+                : 'transform opacity-0 scale-95'}"
+              role="menu"
+              aria-orientation="vertical"
+              aria-labelledby="user-menu"
+            >
               <a
                 href="/profile"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -205,22 +226,15 @@
                   signOut();
                 }}>Sign out</a
               >
-            {:else}
-              <a
-                href="/login"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                role="menuitem"
-                on:click={() => profileButtonHandler()}>Login</a
-              >
-            {/if}
-          </div>
+            </div>
+          {/if}
         </div>
       </div>
     </div>
   </div>
 
   <!-- Mobile menu, show/hide based on menu state. -->
-  <div class={`${isMenuOpen ? "block" : "hidden"} sm:hidden`} id="mobile-menu">
+  <div class={`${isMenuOpen ? 'block' : 'hidden'} sm:hidden`} id="mobile-menu">
     <div class="pt-2 pb-4 space-y-1">
       <!-- Current: "bg-indigo-50 border-yellow-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" -->
       <a
