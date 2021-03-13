@@ -1,41 +1,48 @@
 <script context="module" lang="ts">
 import PageLayout from '../components/PageLayout.svelte';
+import { user } from '../lib/userStore'; /*Ωignore_startΩ*/
+
+
   export async function preload(page, session) {
     let { userToken } = session;
+    let userPayload;
+    const getUserApi = await this.fetch('/api/get-user', {
+    method: 'GET',
+    credentials: 'same-origin',
+  })
+  if (!getUserApi.error) {
+    const userPayload = await getUserApi.json()
+    user.set({...userPayload})
+  }
     if (!userToken) return this.redirect(302, '/login');
-    return userToken;
+    return {userToken, userPayload};
   };
 </script>
 
 <script lang="ts">
-  let apiKey: string;
+  export let userToken;
+  export let userPayload;
   const handleSubmit = async () => {
-    // console.log(user, error)
-    // console.log(supabase.auth.session())
-    const authAPI = await fetch('/api/profile', {
+    const profileApi = await fetch('/api/profile', {
       method: 'POST',
       credentials: 'same-origin',
       body: JSON.stringify({
-        apiKey: apiKey,
-        // userId: userId
+        apiKey: $user.user_metadata.api_key,
       }),
       headers: {
         'Content-Type': 'application/json',
       },
     });
-    const { success } = await authAPI.json();
-    if (success) {
-      // window.location.href = '/';
+    if (profileApi.ok) {
+      const payload = await profileApi.json();
+      user.set({...payload})
     }
   }
 </script>
 
 <PageLayout title="Profile">
   <form class="space-y-8 divide-y divide-gray-200"
-    on:submit|preventDefault={(e) => {
-      // console.log(supabase.auth.session())
-      handleSubmit()
-    }}
+    on:submit|preventDefault={handleSubmit}
   >
     <div class="space-y-8 divide-y divide-gray-200">
       <div>
@@ -50,13 +57,12 @@ import PageLayout from '../components/PageLayout.svelte';
                 name="apiKey"
                 id="apiKey"
                 class="flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
-                bind:value={apiKey}
+                bind:value={$user.user_metadata.api_key}
               />
             </div>
           </div>
         </div>
       </div>
-
       <div class="pt-5">
         <div class="flex justify-end">
           <button

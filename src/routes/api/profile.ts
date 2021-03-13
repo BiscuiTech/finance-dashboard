@@ -6,7 +6,6 @@ export async function post(req: Request, res: Response) {
   const { data: user, error } = await supabase.auth.api.updateUser(
     req.cookies['supaToken'],
     {data:{"api_key": apiKey}});
-    console.log(user);
 
-  return res.end()
+  return res.json({user, error}).end()
 }
