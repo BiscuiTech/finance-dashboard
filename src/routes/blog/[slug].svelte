@@ -1,14 +1,14 @@
 <script context="module" lang="ts">
-	export async function preload({ params }) {
+ export async function load({ page, fetch, session, context }) {
 		// the `slug` parameter is available because
 		// this file is called [slug].svelte
-		const res = await this.fetch(`blog/${params.slug}.json`);
+		const res = await fetch(`blog/${page.params.slug}.json`);
 		const data = await res.json();
 
 		if (res.status === 200) {
-			return { post: data };
+			return {props: {post: data }};
 		} else {
-			this.error(res.status, data.message);
+			return {status:  res.status, error :data.message };
 		}
 	}
 </script>

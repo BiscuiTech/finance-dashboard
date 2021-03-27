@@ -1,11 +1,14 @@
-import type { Request, Response } from "express";
 import supabase from "../../lib/supabase";
 
-export async function post(req: Request, res: Response) {
-  const { apiKey } = req.body;
+export async function post(request, context) {
+  const { apiKey } = request.body;
   const { data: user, error } = await supabase.auth.api.updateUser(
-    req.cookies['supaToken'],
+    request.cookies['supaToken'],
     {data:{"api_key": apiKey}});
 
-  return res.json({user, error}).end()
+  // return res.json({user, error}).end()
+  return {
+    status: 200,
+    body: {user, error}
+  }
 }

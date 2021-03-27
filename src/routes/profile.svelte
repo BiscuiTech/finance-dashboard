@@ -1,12 +1,15 @@
 <script context="module" lang="ts">
 import PageLayout from '../components/PageLayout.svelte';
 import { user } from '../lib/userStore'; /*Ωignore_startΩ*/
+ /*Ωignore_startΩ*/
+ /*Ωignore_startΩ*/
+ /*Ωignore_startΩ*/
 
 
-  export async function preload(page, session) {
+  export async function load({ page, fetch, session, context }) {
     let { userToken } = session;
     let userPayload;
-    const getUserApi = await this.fetch('/api/get-user', {
+    const getUserApi = await fetch('/api/get-user', {
     method: 'GET',
     credentials: 'same-origin',
   })
@@ -14,8 +17,8 @@ import { user } from '../lib/userStore'; /*Ωignore_startΩ*/
     const userPayload = await getUserApi.json()
     user.set({...userPayload})
   }
-    if (!userToken) return this.redirect(302, '/login');
-    return {userToken, userPayload};
+    if (!userToken) return {status: 302, redirect: '/login'};
+    return {props: {userToken, userPayload}};
   };
 </script>
 

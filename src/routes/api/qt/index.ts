@@ -7,7 +7,7 @@ if (!yourRefreshToken) {
   throw new Error("Token is missing")
 }
 
-export default async function(req, res) {
+export default async function(request, context) {
   try {
     // eslint-disable-next-line no-console
     const log = console.log;
@@ -27,10 +27,15 @@ export default async function(req, res) {
 
     log("credentials: ", credentials);
     log("Closing")
-    res.status(200).json(myBalances)
+    return {
+      status: 200,
+      body: myBalances
+    }
   } catch (error) {
     console.error(error.message)
-    res.status(500).json(error)
-    return new Error(error)
+    return {
+      status: 500,
+      body: error
+    }
   }
 }

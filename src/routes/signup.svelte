@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { goto, stores } from "@sapper/app";
-  import PageLayout from "../components/PageLayout.svelte";
-  import { api } from "../lib/post";
+  import { goto } from '$app/navigation';
+import { session } from "$app/stores";
+import PageLayout from "../components/PageLayout.svelte";
+import { api } from "../lib/post";
+
+
 
   let email: string;
   let password: string;
   let rememberMe: string;
   let errors = null;
 
-  const { session } = stores();
   async function submit(event) {
     const response = await api("POST", `/api/login`, { email, password });
     errors = response.errors;

@@ -1,6 +1,6 @@
 import { redeemToken } from 'questrade-ts';
 const QT_REFRESH_TOKEN = "REMOVE-ME-SOON"
-export default async function (req, res) {
+export default async function (request, context) {
   try {
     if (!QT_REFRESH_TOKEN) throw new Error("Missing refresh token");
     const { qtApi } = await redeemToken(QT_REFRESH_TOKEN);
@@ -9,8 +9,14 @@ export default async function (req, res) {
       return [...acc, el.symbolId]
     }, [])
     const positions = await qtApi.getQuotes.byStockIds(symbolIds)
-    res.status(200).json(positions)
+    return {
+      status: 200 ,
+      body:positions
+    }
   } catch (error) {
-    res.status(500).json(error)
+    return {
+      status: 500,
+      body:error
+    }
   }
 }

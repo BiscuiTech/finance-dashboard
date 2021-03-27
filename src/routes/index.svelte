@@ -4,5 +4,5 @@
 
 <PageLayout title="Home" />
 
-<style>
+<style style lang="postcss">
 </style>
