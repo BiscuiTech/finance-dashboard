@@ -1,6 +1,7 @@
 <script context="module">
+	export const prerender = true;
 	export async function load({ page, fetch, session, context }) {
-		if (!session.email) {
+		if (!session?.email) {
 			return {
 				status: 200
 			};
@@ -30,5 +31,6 @@
 {#if $session}
 	<Dashboard {data} />
 {:else}
-	<p>You must be logged in</p>
+	<p>You must be logged in.</p>
+	<a href="/login">Click here</a>
 {/if}

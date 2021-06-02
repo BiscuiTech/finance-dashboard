@@ -1,37 +1,27 @@
 import { COOKIE_NAME } from '$lib/constants';
 import supabase from '$lib/supabase';
+import type { GetSession, Handle } from '@sveltejs/kit';
 import { parse } from 'cookie';
 
-export async function getContext(incoming) {
-	const cookies = parse(incoming.headers.cookie || '');
-	const { user } = await supabase.auth.api.getUser(cookies[COOKIE_NAME.SUPATOKEN])
-
-	if (user) {
-		return {
-			user: {
-				...user,
-				supaToken: cookies[COOKIE_NAME.SUPATOKEN] || null
-			}
-		};
-	}
-}
-
-export function getSession({ context }) {
-	if (context.user?.email) {
+export const getSession: GetSession = (request) => {
+	if (request.locals.user?.email) {
 		return {
 			// only include properties needed client-side —
 			// exclude anything else attached to the user
 			// like access tokens etc
-			supaToken: context.user?.supaToken,
-			email: context.user?.email,
-			role: context.user?.role,
-			user_metadata: context.user?.user_metadata,
+			supaToken: request.locals.user?.supaToken,
+			email: request.locals.user?.email,
+			role: request.locals.user?.role,
+			user_metadata: request.locals.user?.user_metadata,
 		};
 	}
 }
 
-/* export async function handle(request, render) {
-	const response = await render(request);
+export const handle: Handle = async ({ request, resolve }) => {
+	const cookies = parse(request.headers.cookie || '');
+	request.locals.user = await supabase.auth.api.getUser(cookies[COOKIE_NAME.SUPATOKEN])
+
+	const response = await resolve(request);
 
 	return {
 		...response,
@@ -39,4 +29,4 @@ export function getSession({ context }) {
 			...response.headers,
 		}
 	};
-} */
+}
