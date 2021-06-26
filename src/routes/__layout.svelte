@@ -4,7 +4,7 @@
 	import Footer from "$lib/components/Footer.svelte";
 	import Header from "$lib/components/Header.svelte";
 	import { onMount } from "svelte";
-	import '../global.css';
+	import '../app.postcss';
 
   export let segment: string;
   onMount(async () => {
